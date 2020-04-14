@@ -108,6 +108,20 @@ public final class ViewfinderView extends View {
 
     boolean isFirst;
 
+    public ViewfinderView(Context context, int maskColor, int resultColor, int resultPointColor) {
+        super(context);
+        density = context.getResources().getDisplayMetrics().density;
+        ScreenRate = (int) (20 * density);
+        paint = new Paint();
+
+        Resources resources = getResources();
+        this.maskColor = resources.getColor(maskColor);
+        this.resultColor = resources.getColor(resultColor);
+        this.resultPointColor = resources.getColor(resultPointColor);
+        possibleResultPoints = new HashSet<>(5);
+
+    }
+
     public ViewfinderView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -118,7 +132,6 @@ public final class ViewfinderView extends View {
         Resources resources = getResources();
         maskColor = resources.getColor(R.color.viewfinder_mask);
         resultColor = resources.getColor(R.color.result_view);
-
         resultPointColor = resources.getColor(R.color.qrcode_color_def);
         possibleResultPoints = new HashSet<>(5);
     }

@@ -34,19 +34,10 @@
 
         </RelativeLayout>
 
-        <SurfaceView
-            android:id="@+id/preview_view"
+        <com.zihuan.app.qrcodelibrary.zxing.view.QrCodeView
+            android:id="@+id/qrView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/title"
-            android:layout_gravity="center"
-            android:clipToPadding="false" />
-
-        <com.zihuan.app.qrcodelibrary.zxing.view.ViewfinderView
-            android:id="@+id/viewfinder_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true" />
+            android:layout_height="match_parent" />
     </RelativeLayout>
 
 </LinearLayout>
