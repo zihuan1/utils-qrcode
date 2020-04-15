@@ -20,7 +20,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.zihuan.app.qrcodelibrary.zxing.MipcaActivityCapture" />
+        <activity android:name=".MipcaActivityCapture" />
     </application>
 
 </manifest>

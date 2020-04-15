@@ -1,18 +1,14 @@
-package com.zihuan.app.qrcodelibrary.zxing;
+package com.qrcode.app;
 
 import android.app.Activity;
 import android.os.Bundle;
 
-import com.zihuan.app.qrcodelibrary.R;
 import com.zihuan.app.qrcodelibrary.zxing.view.QrCodeView;
 
 public class MipcaActivityCapture extends Activity {
 
     QrCodeView qrCodeView;
 
-    /**
-     * Called when the activity is first created.
-     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
