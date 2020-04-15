@@ -6,7 +6,6 @@ import android.content.Context.VIBRATOR_SERVICE
 import android.content.Intent
 import android.graphics.Bitmap
 import android.media.AudioManager
-import android.media.MediaPlayer
 import android.media.SoundPool
 import android.os.Bundle
 import android.os.Handler
@@ -27,16 +26,16 @@ import java.io.IOException
 import java.util.*
 
 class QrCodeView : FrameLayout, SurfaceHolder.Callback {
-    constructor(context: Context) : super(context) {
-        initView()
-    }
+//    constructor(context: Context) : super(context) {
+//        initView()
+//    }
 
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
-        initView()
+        initView(attrs)
     }
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        initView()
+        initView(attrs)
     }
 
     private var voiceId = 0
@@ -47,16 +46,24 @@ class QrCodeView : FrameLayout, SurfaceHolder.Callback {
     private var characterSet: String? = null
     private var inactivityTimer: InactivityTimer? = null
     private var playBeep = false
-    private val BEEP_VOLUME = 0.05f //音量
     private var vibrate = false
     private lateinit var mActivity: Activity
     private var mQrCodeScanResultListener: QrCodeScanResultListener? = null
-    fun initView() {
+    fun initView(attrs: AttributeSet?) {
         mActivity = context as Activity
         if (mActivity is QrCodeScanResultListener) {
             mQrCodeScanResultListener = mActivity as QrCodeScanResultListener
         }
-        viewfinderView = ViewfinderView(mActivity, R.color.viewfinder_mask, R.color.result_view, R.color.qrcode_color_def)
+        viewfinderView = ViewfinderView(mActivity)
+        val att = context.obtainStyledAttributes(attrs, R.styleable.QrCodeView)
+        val viewfinder_mask = att.getColor(R.styleable.QrCodeView_backgroundColor, resources.getColor(R.color.viewfinder_mask))
+        val result_view = att.getColor(R.styleable.QrCodeView_requestColor, resources.getColor(R.color.result_view))
+        val lineColor = att.getColor(R.styleable.QrCodeView_lineColor, resources.getColor(R.color.qrcode_color_def))
+        val angleColor = att.getColor(R.styleable.QrCodeView_angleColor, resources.getColor(R.color.qrcode_color_def))
+        val textColor = att.getColor(R.styleable.QrCodeView_textColor, resources.getColor(R.color.qrcode_color_def))
+        val text = att.getString(R.styleable.QrCodeView_text)
+        viewfinderView.setColor(viewfinder_mask, result_view, lineColor, angleColor, textColor)
+        viewfinderView.setText(text)
         CameraManager.init(mActivity)
         hasSurface = false
         inactivityTimer = InactivityTimer(mActivity)
@@ -64,7 +71,6 @@ class QrCodeView : FrameLayout, SurfaceHolder.Callback {
         addView(surfaceView)
         addView(viewfinderView)
         val surfaceHolder = surfaceView.holder
-//        initCamera(surfaceHolder)
         surfaceHolder.addCallback(this)
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS)
         decodeFormats = null
@@ -165,7 +171,7 @@ class QrCodeView : FrameLayout, SurfaceHolder.Callback {
     }
 
     fun drawViewfinder() {
-        viewfinderView!!.drawViewfinder()
+        viewfinderView.drawViewfinder()
     }
 
     private fun onPause() {

@@ -1,0 +1,13 @@
+<resources>
+
+    <declare-styleable name="QrCodeView">
+        <attr name="text" format="string" />
+        <attr name="textColor" format="color" />
+
+        <attr name="lineColor" format="color" />
+        <attr name="angleColor" format="color" />
+        <attr name="backgroundColor" format="color" />
+        <attr name="requestColor" format="color" />
+    </declare-styleable>
+
+</resources>

@@ -3,4 +3,5 @@
     <color name="qrcode_color_def">#303F9F</color>
     <color name="viewfinder_mask">#60000000</color>
     <color name="result_view">#b0000000</color>
+
 </resources>

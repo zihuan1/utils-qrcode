@@ -17,17 +17,14 @@
 package com.zihuan.app.qrcodelibrary.zxing.view;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.util.AttributeSet;
+import android.text.TextUtils;
 import android.view.View;
 
 import com.google.zxing.ResultPoint;
-import com.zihuan.app.qrcodelibrary.R;
 import com.zihuan.app.qrcodelibrary.zxing.camera.CameraManager;
 
 import java.util.Collection;
@@ -99,41 +96,39 @@ public final class ViewfinderView extends View {
     private int slideBottom;
 
     private Bitmap resultBitmap;
-    private final int maskColor;
-    private final int resultColor;
+    private int backgroundColor;
+    private int resultColor;
+    private int angleColor;
+    private int textColor;
 
-    private final int resultPointColor;
-    private Collection<ResultPoint> possibleResultPoints;
+    private int lineColor;
+    private Collection<ResultPoint> possibleResultPoints = new HashSet<>(5);
+    ;
     private Collection<ResultPoint> lastPossibleResultPoints;
 
     boolean isFirst;
 
-    public ViewfinderView(Context context, int maskColor, int resultColor, int resultPointColor) {
+    private String mHintText = "把二维码放入框中进行扫描";
+
+    public ViewfinderView(Context context) {
         super(context);
         density = context.getResources().getDisplayMetrics().density;
         ScreenRate = (int) (20 * density);
         paint = new Paint();
 
-        Resources resources = getResources();
-        this.maskColor = resources.getColor(maskColor);
-        this.resultColor = resources.getColor(resultColor);
-        this.resultPointColor = resources.getColor(resultPointColor);
-        possibleResultPoints = new HashSet<>(5);
-
     }
 
-    public ViewfinderView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public void setColor(int mask, int result, int defColor, int angleColor, int textColor) {
+        backgroundColor = mask;
+        resultColor = result;
+        lineColor = defColor;
+        this.angleColor = angleColor;
+        this.textColor = textColor;
+    }
 
-        density = context.getResources().getDisplayMetrics().density;
-        ScreenRate = (int) (20 * density);
-
-        paint = new Paint();
-        Resources resources = getResources();
-        maskColor = resources.getColor(R.color.viewfinder_mask);
-        resultColor = resources.getColor(R.color.result_view);
-        resultPointColor = resources.getColor(R.color.qrcode_color_def);
-        possibleResultPoints = new HashSet<>(5);
+    public void setText(String hintText) {
+        if (!TextUtils.isEmpty(hintText))
+            mHintText = hintText;
     }
 
     @Override
@@ -154,7 +149,7 @@ public final class ViewfinderView extends View {
         int width = canvas.getWidth();
         int height = canvas.getHeight();
 
-        paint.setColor(resultBitmap != null ? resultColor : maskColor);
+        paint.setColor(resultBitmap != null ? resultColor : backgroundColor);
 
         //画出扫描框外面的阴影部分，共四个部分，扫描框的上面到屏幕上面，扫描框的下面到屏幕下面
         //扫描框的左边面到屏幕左边，扫描框的右边到屏幕右边
@@ -171,7 +166,7 @@ public final class ViewfinderView extends View {
             canvas.drawBitmap(resultBitmap, frame.left, frame.top, paint);
         } else {
             //画扫描框边上的角，总共8个部分
-            paint.setColor(Color.WHITE);
+            paint.setColor(angleColor);
             canvas.drawRect(frame.left, frame.top, frame.left + ScreenRate,
                     frame.top + CORNER_WIDTH, paint);
             canvas.drawRect(frame.left, frame.top, frame.left + CORNER_WIDTH, frame.top
@@ -194,17 +189,14 @@ public final class ViewfinderView extends View {
             if (slideTop >= frame.bottom) {
                 slideTop = frame.top;
             }
-            paint.setColor(getResources().getColor(R.color.qrcode_color_def));
+            paint.setColor(lineColor);
             canvas.drawRect(frame.left + MIDDLE_LINE_PADDING, slideTop - MIDDLE_LINE_WIDTH / 2, frame.right - MIDDLE_LINE_PADDING, slideTop + MIDDLE_LINE_WIDTH / 2, paint);
 
             //画扫描框下面的字
-            paint.setColor(Color.WHITE);
+            paint.setColor(textColor);
             paint.setTextSize(TEXT_SIZE * density);
             paint.setAntiAlias(true);
-//            paint.setAlpha(0x40);
-//            paint.setTypeface(Typeface.create("System", Typeface.BOLD));
-            canvas.drawText("把二维码放入框中进行扫描", getMeasuredWidth() / 2 - frame.width() / 2, (frame.bottom + (float) TEXT_PADDING_TOP * density), paint);
-
+            canvas.drawText(mHintText, getMeasuredWidth() / 2 - frame.width() / 2, (frame.bottom + (float) TEXT_PADDING_TOP * density), paint);
 
             Collection<ResultPoint> currentPossible = possibleResultPoints;
             Collection<ResultPoint> currentLast = lastPossibleResultPoints;
@@ -214,7 +206,7 @@ public final class ViewfinderView extends View {
                 possibleResultPoints = new HashSet<>(5);
                 lastPossibleResultPoints = currentPossible;
                 paint.setAlpha(OPAQUE);
-                paint.setColor(resultPointColor);
+                paint.setColor(lineColor);
                 for (ResultPoint point : currentPossible) {
                     canvas.drawCircle(frame.left + point.getX(), frame.top
                             + point.getY(), 6.0f, paint);
@@ -222,16 +214,15 @@ public final class ViewfinderView extends View {
             }
             if (currentLast != null) {
                 paint.setAlpha(OPAQUE / 2);
-                paint.setColor(resultPointColor);
+                paint.setColor(lineColor);
                 for (ResultPoint point : currentLast) {
                     canvas.drawCircle(frame.left + point.getX(), frame.top
                             + point.getY(), 3.0f, paint);
                 }
             }
 
-
-            postInvalidateDelayed(ANIMATION_DELAY, frame.left, frame.top,
-                    frame.right, frame.bottom);
+            //只刷新扫描框的内容，其他地方不刷新
+            postInvalidateDelayed(ANIMATION_DELAY, frame.left, frame.top, frame.right, frame.bottom);
 
         }
     }
