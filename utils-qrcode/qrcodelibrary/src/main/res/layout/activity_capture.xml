@@ -39,7 +39,7 @@
             android:id="@+id/qrView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:text="扫描二维码"
+            app:text="对准二维码，即可自动扫描"
             app:textColor="#FFBC60" />
     </RelativeLayout>
 
